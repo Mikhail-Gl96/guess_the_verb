@@ -41,15 +41,16 @@
 1. Создайте `app` на Heroku 
 2. Перейдите в созданный `app` и выберите GitHub в качестве `Deployment method`
 3. Укажите адрес до **вашего!!!** проекта на гитхабе
-4. Выберите ветку main в разделе `Manual deploy` и нажмите на кнопку `Deploy Branch`
-5. Зайдите в раздел `Settings`
-6. Запишите в раздел `Config Vars` переменные `KEY` и `VALUE`:
+4. Зайдите в раздел `Settings`
+5. Запишите в раздел `Config Vars` переменные `KEY` и `VALUE`:
     `VKONTAKTE_GROUP_TOKEN=ваш_токен_группы вконтакте`<br>
     `TELEGRAM_TOKEN=ваш_токен_телеграм_бота`<br>
     `TELEGRAM_CHAT_ID=ваш_телеграм_айди`<br>
-    `GOOGLE_APPLICATION_CREDENTIALS=путь_до_json_ключа_от_гугла.json`<br>
-    `путь_до_json_ключа_от_гугла={"type": "service_account", ...}` (весь `json` скопировать в поле)<br>
+    `GOOGLE_APPLICATION_CREDENTIALS=google-credentials.json`<br>
+    `GOOGLE_CREDENTIALS ={"type": "service_account", ...}` (весь `json` скопировать в поле)<br>
     `GOOGLE_APPLICATION_PROJECT_ID=project_id_проекта_на_гугл_облаке`<br>
-7. Перейдите в раздел `Resources` и включите бота<br> 
+6. Добавьте в раздел `Buildpacks` `https://github.com/gerywahyunugraha/heroku-google-application-credentials-buildpack`<br>
+7. Зайдите в раздел `Deploy`, выберите ветку main в разделе `Manual deploy` и нажмите на кнопку `Deploy Branch`<br>
+8. Перейдите в раздел `Resources` и включите бота<br> 
    Логи можно посмотреть в `More` -> `View logs`
   
