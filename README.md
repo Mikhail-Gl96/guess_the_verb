@@ -5,10 +5,10 @@
 
 Пример работы:
 
-###Вконтакте<br>
+### Вконтакте<br>
 ![hippo](https://dvmn.org/media/filer_public/1e/f6/1ef61183-56ad-4094-b3d0-21800bdb8b09/demo_vk_bot.gif)
 
-###Телеграм<br>
+### Телеграм<br>
 ![hippo](https://dvmn.org/media/filer_public/7a/08/7a087983-bddd-40a3-b927-a43fb0d2f906/demo_tg_bot.gif)
 
 #### Бот работает с версиями Python 3.6+ <br>С версиями ниже бот не работает!!!
