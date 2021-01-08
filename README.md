@@ -47,7 +47,8 @@
     `VKONTAKTE_GROUP_TOKEN=ваш_токен_группы вконтакте`<br>
     `TELEGRAM_TOKEN=ваш_токен_телеграм_бота`<br>
     `TELEGRAM_CHAT_ID=ваш_телеграм_айди`<br>
-    `GOOGLE_APPLICATION_CREDENTIALS=путь_до_json_ключа_от_гугла`<br>
+    `GOOGLE_APPLICATION_CREDENTIALS=путь_до_json_ключа_от_гугла.json`<br>
+    `путь_до_json_ключа_от_гугла={"type": "service_account", ...}` (весь `json` скопировать в поле)<br>
     `GOOGLE_APPLICATION_PROJECT_ID=project_id_проекта_на_гугл_облаке`<br>
 7. Перейдите в раздел `Resources` и включите бота<br> 
    Логи можно посмотреть в `More` -> `View logs`
