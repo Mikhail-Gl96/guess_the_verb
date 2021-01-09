@@ -12,30 +12,24 @@ from telegram.ext import MessageHandler, Filters
 from MyLogger import TelegramLogsHandler, create_my_logger
 
 
+telegram_logger = create_my_logger(name=__name__, level=logging.INFO)
+
+
 def start(update, context):
     context.bot.send_message(chat_id=update.effective_chat.id, text="I'm a bot, please talk to me!")
     telegram_logger.debug(f'/start command activated by {update.effective_chat.id}')
 
 
-def echo(update, context):
-    try:
-        answer = detect_intent_texts(project_id=GOOGLE_APPLICATION_PROJECT_ID,
-                                     session_id=update.effective_chat.id,
-                                     texts=update.message.text,
-                                     language_code="ru-RU")
-    except Exception as e:
-        telegram_logger.error(f"error: {e}")
-        answer = "Упс, нейронка перегрелась"
-
+def answer_on_intent(update, context):
+    answer = detect_intent_texts(project_id=GOOGLE_APPLICATION_PROJECT_ID,
+                                 session_id=update.effective_chat.id,
+                                 texts=update.message.text,
+                                 language_code="ru-RU")
     if answer:
         context.bot.send_message(chat_id=update.effective_chat.id, text=answer)
-        telegram_logger.debug(f"send: {answer}")
-    else:
-        telegram_logger.debug(f'no intent detected')
 
 
-if __name__ == 'telegram_bot':
-    telegram_logger = create_my_logger(name=__name__, level=logging.INFO)
+if __name__ == '__main__':
     telegram_logger.info(f'Start telegram bot')
 
     load_dotenv()
@@ -53,7 +47,9 @@ if __name__ == 'telegram_bot':
     start_handler = CommandHandler('start', start)
     dispatcher.add_handler(start_handler)
 
-    echo_handler = MessageHandler(Filters.text & (~Filters.command), echo)
+    dispatcher.add_error_handler(telegram_logger)
+
+    echo_handler = MessageHandler(Filters.text & (~Filters.command), answer_on_intent)
     dispatcher.add_handler(echo_handler)
 
     updater.start_polling()

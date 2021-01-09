@@ -12,7 +12,10 @@ from vk_api.longpoll import VkLongPoll, VkEventType
 from MyLogger import create_my_logger
 
 
-def echo(event, vk_api):
+vk_logger = create_my_logger(name=__name__, level=logging.INFO)
+
+
+def answer_on_intent(event, vk_api):
     random_id = random.randint(1, 1000)
     try:
         answer = detect_intent_texts(project_id=GOOGLE_APPLICATION_PROJECT_ID,
@@ -20,8 +23,12 @@ def echo(event, vk_api):
                                      texts=event.text,
                                      language_code="ru-RU")
     except Exception as e:
+        # могут быть ошибкак как и от ВК, так и от гугла
+        # Чтобы сузить список exceptions - необходимо знать какие придут.
+        # А если не знаем какие могут прийти, то перехватываем все и пишем это в логгер.
+        # Пользователю можем ответить заранее загготовленной фразой
         vk_logger.error(f"error: {e}")
-        answer = "Упс, нейронка перегрелась"
+        answer = "Упс, нейронка перегрелась. Обратитесь ко мне чуть позже"
 
     if answer:
         vk_api.messages.send(
@@ -34,8 +41,7 @@ def echo(event, vk_api):
         vk_logger.debug(f'no intent detected')
 
 
-if __name__ == 'vk_bot':
-    vk_logger = create_my_logger(name=__name__, level=logging.INFO)
+if __name__ == '__main__':
     vk_logger.info('Start VK Bot')
 
     load_dotenv()
@@ -53,7 +59,7 @@ if __name__ == 'vk_bot':
             vk_logger.debug('Новое сообщение:')
             if event.to_me:
                 vk_logger.debug(f'Для меня от: {event.user_id}')
-                echo(event, vk_api)
+                answer_on_intent(event, vk_api)
             else:
                 vk_logger.debug(f'От меня для: {event.user_id}')
             vk_logger.debug(f'Текст: {event.text}')

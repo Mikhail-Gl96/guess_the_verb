@@ -4,8 +4,13 @@ import os
 from dotenv import load_dotenv
 
 from google.cloud import dialogflow
+from google.api_core import exceptions
+# google.api_core.exceptions.InvalidArgument
 
 from MyLogger import TelegramLogsHandler, create_my_logger
+
+
+dialogflow_logger = create_my_logger(name=__name__, level=logging.INFO)
 
 
 def detect_intent_texts(project_id, session_id, texts, language_code):
@@ -24,17 +29,13 @@ def detect_intent_texts(project_id, session_id, texts, language_code):
     response = session_client.detect_intent(request={'session': session,
                                                      'query_input': query_input})
 
-    log_msg = 'Query text: {}'.format(response.query_result.query_text) + \
-              '; Detected intent: {} (confidence: {})'.format(
-                  response.query_result.intent.display_name,
-                  response.query_result.intent_detection_confidence) + \
-              '; Fulfillment text: {}\n'.format(response.query_result.fulfillment_text)
+    query_info = response.query_result
+    log_msg = f'Query text: {query_info.query_text}; ' \
+        f'Detected intent: {query_info.intent.display_name} (confidence: {query_info.intent_detection_confidence}); ' \
+        f'Fulfillment text: {query_info.fulfillment_text}\n'
     dialogflow_logger.debug(log_msg)
 
-    if response.query_result.intent.is_fallback:
-        return None
-    else:
-        return response.query_result.fulfillment_text
+    return None if query_info.intent.is_fallback else query_info.fulfillment_text
 
 
 def upload_intent(filepath, project_id):
@@ -56,44 +57,27 @@ def upload_intent(filepath, project_id):
                 response = intents_client.create_intent(request={'parent': parent,
                                                                  'intent': intent})
                 dialogflow_logger.debug('Intent created: {}'.format(response))
-            except Exception as e:
+            except exceptions.InvalidArgument as e:
+                # google.api_core.exceptions.InvalidArgument
+                intent_exists = e.message.count(f"Intent with the display name '{intent_name}' already exists.")
+                if not intent_exists:
+                    raise e
                 dialogflow_logger.error('error: {}'.format(e))
-        try:
-            parent = agents_client.common_project_path(project_id)
-            response = agents_client.train_agent(request={'parent': parent})
-            dialogflow_logger.debug('Intents trained: {}'.format(response))
-        except Exception as e:
-            dialogflow_logger.error('error: {}'.format(e))
+
+        parent = agents_client.common_project_path(project_id)
+        response = agents_client.train_agent(request={'parent': parent})
+        dialogflow_logger.debug('Intents trained: {}'.format(response))
 
 
 def create_dict_for_intent(name, messages, training_parts):
-    training_phrases = []
-    for part in training_parts:
-        part_form = {
-            "parts": [{
-                "text": part
-            }]
-        }
-        training_phrases.append(part_form)
-
-    messages_phrases = []
-    for message in messages:
-        message_form = {
-            "text": {
-                "text": [message]
-            }
-        }
-        messages_phrases.append(message_form)
-
+    training_phrases = [{"parts": [{"text": part}]} for part in training_parts]
+    messages_phrases = [{"text": {"text": [message]}} for message in messages]
     answer = {
         "display_name": name,
         "messages": messages_phrases,
         "training_phrases": training_phrases
     }
     return answer
-
-
-dialogflow_logger = create_my_logger(name=__name__, level=logging.INFO)
 
 
 if __name__ == '__main__':
@@ -103,6 +87,8 @@ if __name__ == '__main__':
 
     # start this file if you want to upload new intents
     path = os.path.join('intents', 'intents.json')
-    upload_intent(filepath=path, project_id=GOOGLE_APPLICATION_PROJECT_ID)
-
+    try:
+        upload_intent(filepath=path, project_id=GOOGLE_APPLICATION_PROJECT_ID)
+    except Exception as e:
+        dialogflow_logger.error('error: {}'.format(e))
 

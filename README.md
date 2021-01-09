@@ -28,13 +28,25 @@
     `VKONTAKTE_GROUP_TOKEN=ваш_токен_группы вконтакте`<br>
     `TELEGRAM_TOKEN=ваш_токен_телеграм_бота`<br>
     `TELEGRAM_CHAT_ID=ваш_телеграм_айди`<br>
-    `GOOGLE_APPLICATION_CREDENTIALS=путь_до_json_ключа_от_гугла`<br>
+    `GOOGLE_APPLICATION_CREDENTIALS=путь_до_json_ключа_от_гугла.json`<br>
+    `путь_до_json_ключа_от_гугла={"type": "service_account", ...}` (весь `json` скопировать в поле)<br>
     `GOOGLE_APPLICATION_PROJECT_ID=project_id_проекта_на_гугл_облаке`<br>
 6. Запустите бота<br>
    Возможные команды для запуска(из консоли, из папки с ботом):<br>
-   `python3 main.py`<br>
-   `python main.py`<br>
-   `python3.6 main.py`<br>
+   ```
+   python3 vk_bot.py
+   python3 telegram_bot.py
+   ```
+   или
+   ```
+   python vk_bot.py
+   python telegram_bot.py
+   ```
+   или
+   ```
+   python3.6 main.py
+   python3.6 telegram_bot.py
+   ```
    
 ## Настройка для деплоя в облако Heroku
 Если не знаем что такое Heroku - гуглим мануал или используем настройку бота из предыдущего туториала
