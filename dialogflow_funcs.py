@@ -5,7 +5,6 @@ from dotenv import load_dotenv
 
 from google.cloud import dialogflow
 from google.api_core import exceptions
-# google.api_core.exceptions.InvalidArgument
 
 from MyLogger import TelegramLogsHandler, create_my_logger
 
@@ -30,9 +29,9 @@ def detect_intent_texts(project_id, session_id, texts, language_code):
                                                      'query_input': query_input})
 
     query_info = response.query_result
-    log_msg = f'Query text: {query_info.query_text}; ' \
-        f'Detected intent: {query_info.intent.display_name} (confidence: {query_info.intent_detection_confidence}); ' \
-        f'Fulfillment text: {query_info.fulfillment_text}\n'
+    log_msg = f'''Query text: {query_info.query_text}; 
+    Detected intent: {query_info.intent.display_name} (confidence: {query_info.intent_detection_confidence}); 
+    Fulfillment text: {query_info.fulfillment_text}\n'''
     dialogflow_logger.debug(log_msg)
 
     return None if query_info.intent.is_fallback else query_info.fulfillment_text
@@ -58,7 +57,6 @@ def upload_intent(filepath, project_id):
                                                                  'intent': intent})
                 dialogflow_logger.debug('Intent created: {}'.format(response))
             except exceptions.InvalidArgument as e:
-                # google.api_core.exceptions.InvalidArgument
                 intent_exists = e.message.count(f"Intent with the display name '{intent_name}' already exists.")
                 if not intent_exists:
                     raise e
@@ -82,13 +80,8 @@ def create_dict_for_intent(name, messages, training_parts):
 
 if __name__ == '__main__':
     load_dotenv()
-    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
     GOOGLE_APPLICATION_PROJECT_ID = os.getenv("GOOGLE_APPLICATION_PROJECT_ID")
 
     # start this file if you want to upload new intents
     path = os.path.join('intents', 'intents.json')
-    try:
-        upload_intent(filepath=path, project_id=GOOGLE_APPLICATION_PROJECT_ID)
-    except Exception as e:
-        dialogflow_logger.error('error: {}'.format(e))
-
+    upload_intent(filepath=path, project_id=GOOGLE_APPLICATION_PROJECT_ID)

@@ -22,23 +22,17 @@ def answer_on_intent(event, vk_api):
                                      session_id=f'{event.user_id}-{random_id}',
                                      texts=event.text,
                                      language_code="ru-RU")
+        if answer:
+            vk_api.messages.send(
+                user_id=event.user_id,
+                message=answer,
+                random_id=random_id
+            )
+            vk_logger.debug(f'send to: {event.user_id} msg: {event.text}')
+        else:
+            vk_logger.debug(f'no intent detected')
     except Exception as e:
-        # могут быть ошибкак как и от ВК, так и от гугла
-        # Чтобы сузить список exceptions - необходимо знать какие придут.
-        # А если не знаем какие могут прийти, то перехватываем все и пишем это в логгер.
-        # Пользователю можем ответить заранее загготовленной фразой
         vk_logger.error(f"error: {e}")
-        answer = "Упс, нейронка перегрелась. Обратитесь ко мне чуть позже"
-
-    if answer:
-        vk_api.messages.send(
-            user_id=event.user_id,
-            message=answer,
-            random_id=random_id
-        )
-        vk_logger.debug(f'send to: {event.user_id} msg: {event.text}')
-    else:
-        vk_logger.debug(f'no intent detected')
 
 
 if __name__ == '__main__':

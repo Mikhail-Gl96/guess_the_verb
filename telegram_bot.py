@@ -47,8 +47,6 @@ if __name__ == '__main__':
     start_handler = CommandHandler('start', start)
     dispatcher.add_handler(start_handler)
 
-    dispatcher.add_error_handler(telegram_logger)
-
     echo_handler = MessageHandler(Filters.text & (~Filters.command), answer_on_intent)
     dispatcher.add_handler(echo_handler)
 
